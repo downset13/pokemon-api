@@ -7,5 +7,5 @@ export interface IPokemon extends Document {
   hp: number;
   attack: number;
   defense: number;
-  photo: string;
+  photo: File;
 }

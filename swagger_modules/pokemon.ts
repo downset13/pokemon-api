@@ -36,7 +36,7 @@ export const pokemonPath = {
             description: 'Pokemon Data',
             required: true,
             content: {
-                'application/json': {
+                'multipart/form-data': {
                     schema: {
                         type: 'object',
                         properties: {
@@ -66,6 +66,7 @@ export const pokemonPath = {
                             },
                             photo: {
                                 type: 'string',
+                                format: 'binary',
                                 required: false
                             }
                         }
@@ -85,6 +86,57 @@ export const pokemonPath = {
     put: {
         tags: ['Pokemon'],
         summary: 'Updates a pokemon.',
+        parameters: [
+            {
+                in: 'path',
+                name: 'id',
+                type: 'string',
+                required: true,
+                description: 'Pokemon ID'
+            },
+        ],
+        requestBody: {
+            description: 'Pokemon Data',
+            required: true,
+            content: {
+                'multipart/form-data': {
+                    schema: {
+                        type: 'object',
+                        properties: {
+                            name: {
+                                type: 'string',
+                                required: true
+                            },
+                            type: {
+                                type: 'string',
+                                required: false
+                            },
+                            gender: {
+                                type: 'string',
+                                required: false
+                            },
+                            hp: {
+                                type: 'number',
+                                required: false
+                            },
+                            attack: {
+                                type: 'number',
+                                required: false
+                            },
+                            defense: {
+                                type: 'number',
+                                required: false
+                            },
+                            photo: {
+                                type: 'string',
+                                format: 'binary',
+                                required: false
+                            }
+                        }
+                    }
+                }
+            }
+        },
         produces: [
             'application/json'
         ],
@@ -96,7 +148,16 @@ export const pokemonPath = {
     },
     delete: {
         tags: ['Pokemon'],
-        summary: 'Deletes a new pokemon.',
+        summary: 'Deletes a pokemon.',
+        parameters: [
+            {
+                in: 'path',
+                name: 'id',
+                type: 'string',
+                required: true,
+                description: 'Pokemon ID'
+            },
+        ],
         produces: [
             'application/json'
         ],

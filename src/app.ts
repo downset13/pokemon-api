@@ -19,6 +19,7 @@ class App {
     this.setControllers();
     this.setErrorHandlingMiddleware();
     this.app.use('/api', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+    this.app.use('/uploads', express.static(__dirname + '/uploads'));
   }
 
   private setConfig() {

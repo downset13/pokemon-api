@@ -1,6 +1,17 @@
 import { NextFunction, Request, Response, Router } from "express";
-
 import { PokemonService } from "../services/pokemon.service";
+import multer from 'multer';
+import path from 'path';
+
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'src/uploads/');
+  },
+  filename: function (req, file, cb) {
+    cb(null, file.originalname + Date.now() + path.extname(file.originalname));
+  }
+});
+const upload = multer({ storage });
 
 export class PokemonController {
   public router = Router();
@@ -11,7 +22,7 @@ export class PokemonController {
   public setRoutes() {
     this.router.route("/").get(this.findAll);
     this.router.route("/:id").get(this.find);
-    this.router.route("/").post(this.add);
+    this.router.route("/").post(upload.single('photo'), this.add);
     this.router.route("/:id").delete(this.delete).put(this.update);
   }
 
@@ -26,7 +37,17 @@ export class PokemonController {
   }
 
   private add = async (req: Request, res: Response, next: NextFunction) => {
-    const addPokemonResult = await this.pokemonService.add(req.body);
+    if (req?.file) {
+      const extension = (path.extname(req.file.originalname)).toLowerCase();
+      if (extension !== '.jpg' && extension !== '.jpeg' && extension !== '.png') {
+        res.status(422).send('Photo must be jpg or png.');
+        return next();
+      }
+    }
+    const addPokemonResult = await this.pokemonService.add({
+      ...req.body,
+      photo: req?.file ? `uploads/${req.file.originalname + Date.now() + path.extname(req.file.originalname)}` : undefined
+    });
     res.send(addPokemonResult);
   };
 
