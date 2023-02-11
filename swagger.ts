@@ -18,6 +18,6 @@ export const swaggerDocument = {
         }
     },
     paths: {
-        '/pokemon': pokemonPath
+        ...pokemonPath
     }
 };

@@ -8,7 +8,7 @@ const storage = multer.diskStorage({
     cb(null, 'src/uploads/');
   },
   filename: function (req, file, cb) {
-    cb(null, file.originalname + Date.now() + path.extname(file.originalname));
+    cb(null, file.originalname.replace(path.extname(file.originalname), '') + Date.now() + path.extname(file.originalname));
   }
 });
 const upload = multer({ storage });
@@ -23,7 +23,7 @@ export class PokemonController {
     this.router.route("/").get(this.findAll);
     this.router.route("/:id").get(this.find);
     this.router.route("/").post(upload.single('photo'), this.add);
-    this.router.route("/:id").delete(this.delete).put(this.update);
+    this.router.route("/:id").delete(this.delete).put(upload.single('photo'), this.update);
   }
 
   private findAll = async (req: Request, res: Response, next: NextFunction) => {
@@ -46,20 +46,30 @@ export class PokemonController {
     }
     const addPokemonResult = await this.pokemonService.add({
       ...req.body,
-      photo: req?.file ? `uploads/${req.file.originalname + Date.now() + path.extname(req.file.originalname)}` : undefined
+      photo: req?.file ? `uploads/${req.file.originalname.replace(path.extname(req.file.originalname), '') + Date.now() + path.extname(req.file.originalname)}` : undefined
     });
     res.send(addPokemonResult);
   };
 
   private delete = async (req: Request, res: Response, next: NextFunction) => {
-    const deletePokemonResult = await this.pokemonService.delete(req.params.id);
-    res.send(deletePokemonResult);
+    await this.pokemonService.delete(req.params.id);
+    res.status(200).send('Pokemon Deleted');
   };
 
   private update = async (req: Request, res: Response, next: NextFunction) => {
+    if (req?.file) {
+      const extension = (path.extname(req.file.originalname)).toLowerCase();
+      if (extension !== '.jpg' && extension !== '.jpeg' && extension !== '.png') {
+        res.status(422).send('Photo must be jpg or png.');
+        return next();
+      }
+    }
     const updatePokemonResult = await this.pokemonService.update(
       req.params.id,
-      req.body
+      {
+        ...req.body,
+        photo: req?.file ? `uploads/${req.file.originalname.replace(path.extname(req.file.originalname), '') + Date.now() + path.extname(req.file.originalname)}` : undefined
+      }
     );
     res.send(updatePokemonResult);
   };

@@ -51,13 +51,13 @@ export class PokemonService {
   public async update(id: string, pokemon: IPokemon | Partial<IPokemon>) {
     const updatedPokemon: Promise<IPokemon> = await Pokemon.findByIdAndUpdate(
       id,
-      pokemon
+      pokemon,
+      { new: true }
     ).exec();
 
     if (!updatedPokemon) {
       throw new HttpError(`Pokemon with id '${id}' not found`, 404);
     }
-
     return updatedPokemon;
   }
 }
