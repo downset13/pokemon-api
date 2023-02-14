@@ -8,6 +8,10 @@ import { handleErrors } from "./middleware/error-handler.middleware";
 import mongoose from "mongoose";
 import swaggerUi from 'swagger-ui-express';
 import { swaggerDocument } from '../swagger';
+import { ItemController } from "./controllers/item.controller";
+import { ItemService } from "./services/item.service";
+import { EvolutionController } from "./controllers/evolution.controller";
+import { EvolutionService } from "./services/evolution.service";
 
 class App {
   public app: express.Application;
@@ -42,6 +46,10 @@ class App {
   private setControllers() {
     const pokemonController = new PokemonController(new PokemonService());
     this.app.use("/pokemon", pokemonController.router);
+    const itemController = new ItemController(new ItemService());
+    this.app.use("/item", itemController.router);
+    const evolutionController = new EvolutionController(new EvolutionService());
+    this.app.use("/evolution", evolutionController.router);
   }
 
   private setErrorHandlingMiddleware() {
